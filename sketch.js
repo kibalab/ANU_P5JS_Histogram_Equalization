@@ -1,29 +1,27 @@
-let img;
+function setup() {
+  loadImage("FBvAptTVkAUKLHX.jfif", img => {
+    createCanvas(img.width * 3, img.height);
+    img.filter(GRAY);
 
-function preload() {
-  // 이미지를 미리 로드
-  img = loadImage("FBvAptTVkAUKLHX.jfif");
+    drawImg(img, 0, "Original (GRAY)");
+    histogramStretch(img);  
+    drawImg(img, 1, "Stretch (GRAY)");
+    histogramEqualization(img);
+    drawImg(img, 2, "Equalization (GRAY)");
+  });
 }
 
-function setup() {
-  createCanvas(img.width * 3, img.height);
-
-  // 이미지를 그림
-  image(img, 0, 0);
-
-  // 흑백 이미지로 변환
-  img.filter(GRAY);
-
-  // 흑백 이미지를 그림
-  image(img, 0, 0);
+function drawImg(img, index, label)
+{
+  image(img, img.width * index, 0);
   textSize(32);
   fill(255, 255, 255);
-  text("Original (GRAY)", 10, 30);
-
-  // 히스토그램 확장
+  text(label, 10 + img.width * index, 30);
+}
+function histogramStretch(img)
+{
   img.loadPixels();
-  let minVal = 255;
-  let maxVal = 0;
+  let minVal = 255, maxVal = 0 ;
   for (let i = 0; i < img.pixels.length; i += 4) {
     let pixelValue = img.pixels[i];
     minVal = min(minVal, pixelValue);
@@ -34,16 +32,11 @@ function setup() {
     img.pixels[i + 1] = img.pixels[i];
     img.pixels[i + 2] = img.pixels[i];
   }
-  // 이미지에 전체 픽셀 갱신
   img.updatePixels();
+}
 
-  // 변환된 이미지를 그림
-  image(img, img.width, 0);
-  textSize(32);
-  fill(255, 255, 255);
-  text("Stretch (GRAY)", 10 + img.width, 30);
-
-  // 히스토그램 평탄화
+function histogramEqualization(img)
+{
   let hist = new Array(256).fill(0);
   for (let i = 0; i < img.pixels.length; i += 4) {
     let pixelValue = img.pixels[i];
@@ -62,13 +55,5 @@ function setup() {
     img.pixels[i + 1] = hist[pixelValue];
     img.pixels[i + 2] = hist[pixelValue];
   }
-
-  // 이미지에 전체 픽셀 갱신
   img.updatePixels();
-
-  // 변환된 이미지를 그림
-  image(img, img.width * 2, 0);
-  textSize(32);
-  fill(255, 255, 255);
-  text("Equalization (GRAY)", 10 + img.width * 2, 30);
 }
